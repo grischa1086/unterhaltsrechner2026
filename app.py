@@ -1,11 +1,9 @@
 import streamlit as st
-from fpdf2 import FPDF
-from datetime import datetime
 
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
 
 st.title("👨 Unterhaltsrechner 2026 – Komplettversion")
-st.markdown("**Kindes- + Ehegattenunterhalt nach Düsseldorfer Tabelle & Praxis 2026**")
+st.markdown("**Kindes- + Ehegattenunterhalt nach Düsseldorfer Tabelle 2026**")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -15,9 +13,8 @@ with col1:
 
 with col2:
     weitere_kinder = st.number_input("**Weitere Kinder** in neuer Beziehung", min_value=0, value=0, step=1)
-    ehegattenunterhalt = st.checkbox("**Auch Ehegattenunterhalt** berechnen (verheiratet gewesen)", value=False)
+    ehegattenunterhalt = st.checkbox("**Auch Ehegattenunterhalt** berechnen", value=False)
 
-# Kinder-Alter
 alter_liste = []
 for i in range(anzahl_kinder):
     alter = st.number_input(f"Alter Kind {i+1} (Jahre)", min_value=0, max_value=30, value=8, step=1)
@@ -26,15 +23,14 @@ for i in range(anzahl_kinder):
 sonderbedarf = st.number_input("**Sonderbedarf** pro Monat (€)", min_value=0, value=0, step=10)
 umgangskosten = st.number_input("**Umgangskosten** pro Monat (€)", min_value=0, value=0, step=10)
 
-# === NEUER TEIL: Ehegattenunterhalt ===
 if ehegattenunterhalt:
     st.subheader("Ehegattenunterhalt")
-    netto_ex = st.number_input("**Nettoeinkommen der Ex-Frau** (€)", min_value=0, value=1200, step=50)
+    netto_ex = st.number_input("**Nettoeinkommen der Ex** (€)", min_value=0, value=1200, step=50)
     ehe_dauer = st.number_input("**Dauer der Ehe** (Jahre)", min_value=1, value=8, step=1)
-    betreuung = st.checkbox("Ex betreut hauptsächlich die Kinder (weniger Erwerbsobliegenheit)", value=True)
+    betreuung = st.checkbox("Ex betreut hauptsächlich die Kinder", value=True)
 
 if st.button("Jetzt alles berechnen", type="primary", use_container_width=True):
-    # Kindesunterhalt (wie vorher)
+    # Kindesunterhalt
     def get_gruppe(netto):
         grenzen = [2100, 2500, 2900, 3300, 3700, 4100, 4500, 4900, 5300, 5700, 6100, 6500, 6900, 7300, 11200]
         for i, g in enumerate(grenzen):
@@ -54,29 +50,28 @@ if st.button("Jetzt alles berechnen", type="primary", use_container_width=True):
     halbes_kindergeld = 129.50 * anzahl_kinder
     zahlbetrag_kind = max(brutto_bedarf - halbes_kindergeld, 0) + sonderbedarf - umgangskosten
 
-    # Ehegattenunterhalt (3/7-Methode, vereinfacht)
+    # Ehegattenunterhalt
     zahlbetrag_ehe = 0
     if ehegattenunterhalt:
         differenz = netto - netto_ex
         if differenz > 0:
             zahlbetrag_ehe = round(differenz * 3/7)
             if betreuung:
-                zahlbetrag_ehe = round(zahlbetrag_ehe * 1.15)  # leichte Erhöhung bei Betreuung
+                zahlbetrag_ehe = round(zahlbetrag_ehe * 1.15)
         selbstbehalt_ehe = 1600 if erwerbstaetig else 1475
         rest_nach_kind = netto - zahlbetrag_kind
         if rest_nach_kind < selbstbehalt_ehe:
-            zahlbetrag_ehe = max(0, rest_nach_kind - selbstbehalt_ehe + 100)  # Puffer
+            zahlbetrag_ehe = max(0, rest_nach_kind - selbstbehalt_ehe + 100)
 
-    gesamtunterhalt = zahlbetrag_kind + zahlbetrag_ehe
-    rest = netto - gesamtunterhalt
+    gesamt = zahlbetrag_kind + zahlbetrag_ehe
+    rest = netto - gesamt
     selbstbehalt = 1450 if erwerbstaetig else 1200
 
-    # Ausgabe
     st.subheader("Ergebnis")
     st.success(f"**Kindesunterhalt:** {zahlbetrag_kind:.2f} €")
     if ehegattenunterhalt:
         st.info(f"**Ehegattenunterhalt:** {zahlbetrag_ehe:.2f} €")
-    st.success(f"**Gesamtunterhalt:** {gesamtunterhalt:.2f} €")
+    st.success(f"**Gesamtunterhalt:** {gesamt:.2f} €")
     st.info(f"**Dir bleiben danach:** {rest:.2f} €")
 
     if rest < selbstbehalt:
@@ -84,25 +79,5 @@ if st.button("Jetzt alles berechnen", type="primary", use_container_width=True):
     else:
         st.success("✅ Selbstbehalt eingehalten.")
 
-    # PDF (erweitert)
-    def create_pdf():
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="Unterhaltsrechner 2026 - Persönlicher Bericht", ln=1, align='C')
-        pdf.ln(10)
-        pdf.cell(200, 10, txt=f"Nettoeinkommen: {netto} €", ln=1)
-        pdf.cell(200, 10, txt=f"Kindesunterhalt: {zahlbetrag_kind:.2f} €", ln=1)
-        if ehegattenunterhalt:
-            pdf.cell(200, 10, txt=f"Ehegattenunterhalt: {zahlbetrag_ehe:.2f} €", ln=1)
-        pdf.cell(200, 10, txt=f"Gesamt: {gesamtunterhalt:.2f} €", ln=1)
-        pdf.cell(200, 10, txt=f"Rest: {rest:.2f} €", ln=1)
-        pdf.ln(10)
-        pdf.cell(200, 10, txt="Hinweis: Reine Schätzung – keine Rechtsberatung!", ln=1)
-        pdf.output("unterhalt_bericht.pdf")
-        return "unterhalt_bericht.pdf"
-
-    st.download_button("PDF-Bericht herunterladen", data=open(create_pdf(), "rb").read(), file_name="unterhaltsbericht.pdf", mime="application/pdf")
-
 st.markdown("---")
-st.caption("Erstellt mit Grok • Vollständig mit Ehegattenunterhalt • Februar 2026")
+st.caption("Erstellt mit Grok • Februar 2026 • Keine Rechtsberatung")
