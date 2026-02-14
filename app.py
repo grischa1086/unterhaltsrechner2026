@@ -1,4 +1,6 @@
 import streamlit as st
+from fpdf2 import FPDF
+from datetime import datetime
 
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
 
@@ -79,5 +81,32 @@ if st.button("Jetzt alles berechnen", type="primary", use_container_width=True):
     else:
         st.success("✅ Selbstbehalt eingehalten.")
 
+    # PDF-Export
+    def create_pdf():
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="Unterhaltsrechner 2026 - Persönlicher Bericht", ln=1, align='C')
+        pdf.ln(15)
+        pdf.cell(200, 10, txt=f"Nettoeinkommen: {netto:,} €", ln=1)
+        pdf.cell(200, 10, txt=f"Kindesunterhalt: {zahlbetrag_kind:.2f} €", ln=1)
+        if ehegattenunterhalt:
+            pdf.cell(200, 10, txt=f"Ehegattenunterhalt: {zahlbetrag_ehe:.2f} €", ln=1)
+        pdf.cell(200, 10, txt=f"Gesamtunterhalt: {gesamt:.2f} €", ln=1)
+        pdf.cell(200, 10, txt=f"Dir bleiben: {rest:.2f} €", ln=1)
+        pdf.ln(10)
+        pdf.cell(200, 10, txt=f"Stand: {datetime.now().strftime('%d.%m.%Y')}", ln=1)
+        pdf.cell(200, 10, txt="Hinweis: Dies ist eine Schätzung. Keine Rechtsberatung!", ln=1)
+        pdf.output("unterhaltsbericht.pdf")
+        with open("unterhaltsbericht.pdf", "rb") as f:
+            return f.read()
+
+    st.download_button(
+        label="📄 PDF-Bericht herunterladen",
+        data=create_pdf(),
+        file_name="unterhaltsbericht.pdf",
+        mime="application/pdf"
+    )
+
 st.markdown("---")
-st.caption("Erstellt mit Grok • Februar 2026 • Keine Rechtsberatung")
+st.caption("Erstellt mit Grok • Vollversion mit PDF-Export • Februar 2026")
