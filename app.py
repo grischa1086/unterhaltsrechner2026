@@ -1,5 +1,5 @@
 import streamlit as st
-from fpdf import FPDF
+from fpdf2 import FPDF
 from datetime import datetime
 
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
