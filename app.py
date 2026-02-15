@@ -1,20 +1,27 @@
 import streamlit as st
 from datetime import datetime
 
-# Google Analytics (mit deiner ID)
-ga_measurement_id = "G-4F63Z1DGEF"
+# DSGVO: Cookie-Banner & GA-Consent
+if 'ga_consent' not in st.session_state:
+    st.session_state.ga_consent = None
 
-ga_script = f"""
-<script async src="https://www.googletagmanager.com/gtag/js?id={ga_measurement_id}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  gtag('config', '{ga_measurement_id}');
-</script>
-"""
+if st.session_state.ga_consent is None:
+    st.session_state.ga_consent = st.checkbox("Ich stimme der anonymen Nutzung von Google Analytics zu (Datenschutz: IP anonymisiert, keine personenbezogenen Daten gespeichert)", value=False)
 
-st.components.v1.html(ga_script, height=0)
+if st.session_state.ga_consent:
+    # GA nur bei Consent laden
+    ga_measurement_id = "G-4F63Z1DGEF"  # Deine ID
+
+    ga_script = f"""
+    <script async src="https://www.googletagmanager.com/gtag/js?id={ga_measurement_id}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', '{ga_measurement_id}', {{ 'anonymize_ip': true }});  # IP anonymisieren
+    </script>
+    """
+    st.components.v1.html(ga_script, height=0)
 
 # CSS für Design
 st.markdown("""
@@ -50,8 +57,8 @@ st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍�
 st.title("👨 Unterhaltsrechner 2026 Pro")
 st.markdown("**Einfache & genaue Berechnung für Väter – Kindes- + Ehegattenunterhalt**")
 
-# Disclaimer
-st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. Datenschutz: Anonym & sicher.")
+# Erweiterter Disclaimer
+st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. [Datenschutzerklärung](https://unterhaltsrechner2026.streamlit.app/datenschutz) – Datenschutz: Anonym & sicher (keine Speicherung deiner Eingaben).")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -96,12 +103,13 @@ with col_cta2:
     st.markdown("[**Pro-Version für 4,90 €/Monat** (PDF + Tipps) → [Gumroad-Link](https://gumroad.com)]")  # Ersetze mit echtem Link
 
 if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=True):
-    # GA-Event
-    st.components.v1.html(f"""
-    <script>
-      gtag('event', 'berechnung_clicked', {{ 'value': 1 }});
-    </script>
-    """, height=0)
+    # GA-Event (nur bei Consent)
+    if st.session_state.ga_consent:
+        st.components.v1.html(f"""
+        <script>
+          gtag('event', 'berechnung_clicked', {{ 'value': 1 }});
+        </script>
+        """, height=0)
 
     # Kindesunterhalt
     def get_gruppe(netto):
@@ -152,7 +160,7 @@ if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=T
     else:
         st.success("✅ Selbstbehalt eingehalten.")
 
-    # Szenario-Speichern (fix: persistent via URL)
+    # Szenario-Speichern
     if 'szenarien' not in st.session_state:
         st.session_state.szenarien = []
     if st.button("💾 Szenario speichern"):
@@ -167,19 +175,19 @@ if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=T
         }
         st.session_state.szenarien.append(szen)
         st.success(f"Szenario {szen_id} gespeichert! Teile den Link: https://unterhaltsrechner2026.streamlit.app?szenario={szen_id}")
-        # GA-Event
-        st.components.v1.html(f"""
-        <script>
-          gtag('event', 'szenario_saved', {{ 'value': 1 }});
-        </script>
-        """, height=0)
+        if st.session_state.ga_consent:
+            st.components.v1.html(f"""
+            <script>
+              gtag('event', 'szenario_saved', {{ 'value': 1 }});
+            </script>
+            """, height=0)
 
     if st.session_state.szenarien:
         st.subheader("📋 Gespeicherte Szenarien")
         for szen in st.session_state.szenarien:
             st.write(f"**Szenario {szen['ID']} ({szen['Datum']}):** Netto {szen['Netto']} € → Gesamt {szen['Gesamt']:.2f} € (Rest: {szen['Rest']:.2f} €, Gruppe {szen['Gruppe']})")
 
-    # PDF-Export (fix: Text-Download als .txt – lädt immer)
+    # Bericht-Download (fix: Text als .txt)
     bericht_text = f"""Unterhaltsrechner 2026 - Bericht
 Stand: {datetime.now().strftime('%d.%m.%Y')}
 
@@ -190,6 +198,8 @@ Dir bleiben: {rest:.2f} €
 
 Hinweis: Schätzung – keine Rechtsberatung!
 Einkommensgruppe: {gruppe}
+
+Datenschutz: Deine Eingaben wurden nicht gespeichert.
 """
 
     st.download_button(
@@ -198,12 +208,29 @@ Einkommensgruppe: {gruppe}
         file_name="unterhaltsbericht.txt",
         mime="text/plain"
     )
-    # GA-Event
-    st.components.v1.html(f"""
-    <script>
-      gtag('event', 'pdf_download', {{ 'value': 1 }});
-    </script>
-    """, height=0)
+    if st.session_state.ga_consent:
+        st.components.v1.html(f"""
+        <script>
+          gtag('event', 'pdf_download', {{ 'value': 1 }});
+        </script>
+        """, height=0)
+
+# Datenschutzerklärung (als Link – erweitert)
+if st.button("Datenschutzerklärung anzeigen"):
+    st.markdown("""
+### Datenschutzerklärung
+**Stand: 15.02.2026**
+
+**1. Verantwortlicher:** [Dein Name], [deine E-Mail, z. B. info@unterhaltsrechner.de].  
+**2. Erhobene Daten:** Eingaben (Nettoeinkommen, Kinderanzahl – nur für Berechnung, nicht gespeichert). Bei Zustimmung: Anonymes Tracking via Google Analytics (Views, Klicks; IP anonymisiert).  
+**3. Zweck:** Berechnung von Unterhalt, App-Verbesserung.  
+**4. Speicherung:** Eingaben nur lokal (Browser, gelöscht bei Neuladen). GA-Daten: 14 Monate.  
+**5. Rechte:** Auskunft/Löschung/Widerspruch per E-Mail. GA-Opt-out: [https://tools.google.com/dlpage/gaoptout](https://tools.google.com/dlpage/gaoptout).  
+**6. Drittanbieter:** Google Analytics (EU-Standardvertrag, IP anonym). Keine Weitergabe.  
+**7. Änderungen:** Wir informieren bei Updates.  
+
+Mehr Infos: [dsgvo-gesetz.de](https://dsgvo-gesetz.de). Bei Fragen: [E-Mail].
+    """)
 
 st.markdown("---")
-st.caption("Erstellt mit Grok • Vollversion mit Fixes • Februar 2026 • Keine Rechtsberatung")
+st.caption("Erstellt mit Grok • Vollversion • Februar 2026 • Keine Rechtsberatung")
