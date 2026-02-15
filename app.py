@@ -110,7 +110,7 @@ with col_cta2:
             st.markdown("""
             ### Datenschutzerklärung
 
-            **1. Verantwortlicher:** [Dein Name], [deine E-Mail, z. B. info@unterhaltsrechner.de].  
+            **1. Verantwortlicher:** [Gregor Enns], [gregor.enns@gmx.de].  
             **2. Erhobene Daten:** Eingaben (Nettoeinkommen, Kinderanzahl – nur für Berechnung, nicht gespeichert). Bei Zustimmung: Anonymes Tracking via Google Analytics (Views, Klicks; IP anonymisiert).  
             **3. Zweck:** Berechnung von Unterhalt, App-Verbesserung.  
             **4. Speicherung:** Eingaben nur lokal (Browser, gelöscht bei Neuladen). GA-Daten: 14 Monate.  
@@ -129,10 +129,10 @@ if st.button("Impressum anzeigen", type="secondary"):
 
         **Angaben gemäß § 5 TMG:**
 
-        [Dein Name]  
-        [Deine Adresse, z. B. Musterstraße 1, 12345 Musterstadt]  
-        [Telefon: +49 123 456789]  
-        [E-Mail: info@unterhaltsrechner.de]  
+        [Gregor Enns]  
+        [Detmolder Weg 14, 32657 Lemgo]  
+        [Telefon: +49 1717054933]  
+        [E-Mail: gregor.enns@gmx.de]  
 
         **Haftungshinweis:** Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.  
 
