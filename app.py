@@ -124,7 +124,7 @@ with col_cta2:
             st.markdown("""
             ### Datenschutzerklärung
 
-            **1. Verantwortlicher:** [Dein Name], [deine E-Mail, z. B. info@unterhaltsrechner.de].  
+            **1. Verantwortlicher:** [Gregor Enns], [gregor.enns@gmx.de].  
             **2. Erhobene Daten:** Eingaben (Nettoeinkommen, Kinderanzahl – nur für Berechnung, nicht gespeichert). Bei Zustimmung: Anonymes Tracking via Google Analytics (Views, Klicks; IP anonymisiert).  
             **3. Zweck:** Berechnung von Unterhalt, App-Verbesserung.  
             **4. Speicherung:** Eingaben nur lokal (Browser, gelöscht bei Neuladen). GA-Daten: 14 Monate.  
