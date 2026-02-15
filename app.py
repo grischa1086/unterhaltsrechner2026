@@ -179,9 +179,8 @@ if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=T
         for szen in st.session_state.szenarien:
             st.write(f"**Szenario {szen['ID']} ({szen['Datum']}):** Netto {szen['Netto']} € → Gesamt {szen['Gesamt']:.2f} € (Rest: {szen['Rest']:.2f} €, Gruppe {szen['Gruppe']})")
 
-    # PDF-Export (fix: Text als Download, formatiert)
-    if st.button("📄 Bericht herunterladen (TXT)"):
-        bericht = f"""Unterhaltsrechner 2026 - Bericht
+    # PDF-Export (fix: Text-Download als .txt – lädt immer)
+    bericht_text = f"""Unterhaltsrechner 2026 - Bericht
 Stand: {datetime.now().strftime('%d.%m.%Y')}
 
 Nettoeinkommen: {netto} €
@@ -190,20 +189,21 @@ Gesamtunterhalt: {gesamt:.2f} €
 Dir bleiben: {rest:.2f} €
 
 Hinweis: Schätzung – keine Rechtsberatung!
-Gruppe: {gruppe}
+Einkommensgruppe: {gruppe}
 """
-        st.download_button(
-            label="📥 Download Bericht",
-            data=bericht,
-            file_name="unterhaltsbericht.txt",
-            mime="text/plain"
-        )
-        # GA-Event
-        st.components.v1.html(f"""
-        <script>
-          gtag('event', 'pdf_download', {{ 'value': 1 }});
-        </script>
-        """, height=0)
+
+    st.download_button(
+        label="📄 Bericht herunterladen (TXT)",
+        data=bericht_text,
+        file_name="unterhaltsbericht.txt",
+        mime="text/plain"
+    )
+    # GA-Event
+    st.components.v1.html(f"""
+    <script>
+      gtag('event', 'pdf_download', {{ 'value': 1 }});
+    </script>
+    """, height=0)
 
 st.markdown("---")
 st.caption("Erstellt mit Grok • Vollversion mit Fixes • Februar 2026 • Keine Rechtsberatung")
