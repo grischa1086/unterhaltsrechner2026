@@ -1,4 +1,9 @@
 import streamlit as st
+from streamlit_ga import GoogleAnalytics
+
+# Dein GA-Tracking-ID (z. B. 'G-XXXXXXXXXX' – erstelle ein Konto auf analytics.google.com)
+ga = GoogleAnalytics('G-DEINE-ID')
+ga.track()
 
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
 
