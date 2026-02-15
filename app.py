@@ -1,5 +1,20 @@
 import streamlit as st
 
+# ====================== GOOGLE ANALYTICS ======================
+ga_measurement_id = "G-4F63Z1DGEF"   # ←←← HIER DEINE ID EINFÜGEN (z. B. G-4F63Z1DGEF)
+
+ga_script = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={ga_measurement_id}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{ga_measurement_id}');
+</script>
+"""
+st.components.v1.html(ga_script, height=0)
+# ============================================================
+
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
 
 st.title("👨 Unterhaltsrechner 2026 – Komplettversion")
