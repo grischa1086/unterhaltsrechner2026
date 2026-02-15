@@ -58,7 +58,7 @@ st.title("👨 Unterhaltsrechner 2026 Pro")
 st.markdown("**Einfache & genaue Berechnung für Väter – Kindes- + Ehegattenunterhalt**")
 
 # Erweiterter Disclaimer
-st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. Datenschutz: Anonym & sicher (keine Speicherung deiner Eingaben). [Datenschutzerklärung anzeigen](#datenschutz)")
+st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. Datenschutz: Anonym & sicher (keine Speicherung deiner Eingaben).")
 
 col1, col2 = st.columns(2)
 with col1:
