@@ -58,7 +58,7 @@ st.title("👨 Unterhaltsrechner 2026 Pro")
 st.markdown("**Einfache & genaue Berechnung für Väter – Kindes- + Ehegattenunterhalt**")
 
 # Erweiterter Disclaimer
-st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. [Datenschutzerklärung](https://unterhaltsrechner2026.streamlit.app/datenschutz) – Datenschutz: Anonym & sicher (keine Speicherung deiner Eingaben).")
+st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026 – **keine Rechtsberatung**! Für deinen Fall: Jugendamt, Anwalt oder offiziellen Rechner konsultieren. Datenschutz: Anonym & sicher (keine Speicherung deiner Eingaben). [Datenschutzerklärung anzeigen](#datenschutz)")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -93,14 +93,28 @@ if ehegattenunterhalt:
     ehe_dauer = st.number_input("**Dauer der Ehe** (Jahre)", min_value=1, value=8, step=1)
     betreuung = st.checkbox("Ex betreut hauptsächlich die Kinder", value=True)
 
-# CTA
+# CTA (ohne Pro-Version)
 col_cta1, col_cta2 = st.columns(2)
 with col_cta1:
     if st.button("📱 App teilen", type="secondary"):
         st.balloons()
         st.success("Danke fürs Teilen! Deine Empfehlung hilft anderen Vätern. 😊")
 with col_cta2:
-    st.markdown("[**Pro-Version für 4,90 €/Monat** (PDF + Tipps) → [Gumroad-Link](https://gumroad.com)]")  # Ersetze mit echtem Link
+    if st.button("Datenschutzerklärung anzeigen", type="secondary"):
+        with st.expander("Datenschutzerklärung (Stand: 15.02.2026)"):
+            st.markdown("""
+            ### Datenschutzerklärung
+
+            **1. Verantwortlicher:** [Dein Name], [deine E-Mail, z. B. info@unterhaltsrechner.de].  
+            **2. Erhobene Daten:** Eingaben (Nettoeinkommen, Kinderanzahl – nur für Berechnung, nicht gespeichert). Bei Zustimmung: Anonymes Tracking via Google Analytics (Views, Klicks; IP anonymisiert).  
+            **3. Zweck:** Berechnung von Unterhalt, App-Verbesserung.  
+            **4. Speicherung:** Eingaben nur lokal (Browser, gelöscht bei Neuladen). GA-Daten: 14 Monate.  
+            **5. Rechte:** Auskunft/Löschung/Widerspruch per E-Mail. GA-Opt-out: [https://tools.google.com/dlpage/gaoptout](https://tools.google.com/dlpage/gaoptout).  
+            **6. Drittanbieter:** Google Analytics (EU-Standardvertrag, IP anonym). Keine Weitergabe.  
+            **7. Änderungen:** Wir informieren bei Updates.  
+
+            Mehr Infos: [dsgvo-gesetz.de](https://dsgvo-gesetz.de). Bei Fragen: [E-Mail].
+            """)
 
 if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=True):
     # GA-Event (nur bei Consent)
@@ -187,7 +201,7 @@ if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=T
         for szen in st.session_state.szenarien:
             st.write(f"**Szenario {szen['ID']} ({szen['Datum']}):** Netto {szen['Netto']} € → Gesamt {szen['Gesamt']:.2f} € (Rest: {szen['Rest']:.2f} €, Gruppe {szen['Gruppe']})")
 
-    # Bericht-Download (fix: Text als .txt)
+    # Bericht-Download
     bericht_text = f"""Unterhaltsrechner 2026 - Bericht
 Stand: {datetime.now().strftime('%d.%m.%Y')}
 
@@ -214,23 +228,6 @@ Datenschutz: Deine Eingaben wurden nicht gespeichert.
           gtag('event', 'pdf_download', {{ 'value': 1 }});
         </script>
         """, height=0)
-
-# Datenschutzerklärung (als Link – erweitert)
-if st.button("Datenschutzerklärung anzeigen"):
-    st.markdown("""
-### Datenschutzerklärung
-**Stand: 15.02.2026**
-
-**1. Verantwortlicher:** [Gregor Enns], [gregor.enns@gmx.de].  
-**2. Erhobene Daten:** Eingaben (Nettoeinkommen, Kinderanzahl – nur für Berechnung, nicht gespeichert). Bei Zustimmung: Anonymes Tracking via Google Analytics (Views, Klicks; IP anonymisiert).  
-**3. Zweck:** Berechnung von Unterhalt, App-Verbesserung.  
-**4. Speicherung:** Eingaben nur lokal (Browser, gelöscht bei Neuladen). GA-Daten: 14 Monate.  
-**5. Rechte:** Auskunft/Löschung/Widerspruch per E-Mail. GA-Opt-out: [https://tools.google.com/dlpage/gaoptout](https://tools.google.com/dlpage/gaoptout).  
-**6. Drittanbieter:** Google Analytics (EU-Standardvertrag, IP anonym). Keine Weitergabe.  
-**7. Änderungen:** Wir informieren bei Updates.  
-
-Mehr Infos: [dsgvo-gesetz.de](https://dsgvo-gesetz.de). Bei Fragen: [E-Mail].
-    """)
 
 st.markdown("---")
 st.caption("Erstellt mit Grok • Vollversion • Februar 2026 • Keine Rechtsberatung")
