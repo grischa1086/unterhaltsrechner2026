@@ -23,7 +23,7 @@ if st.session_state.ga_consent:
     """
     st.components.v1.html(ga_script, height=0)
 
-# CSS für Design & Barrierefreiheit (Alt-Text für Emojis)
+# CSS für Design & Barrierefreiheit
 st.markdown("""
 <style>
 .stApp {{
@@ -67,35 +67,35 @@ st.warning("**Wichtig:** Das ist eine Schätzung nach Düsseldorfer Tabelle 2026
 
 col1, col2 = st.columns(2)
 with col1:
-    netto = st.number_input("💰 Dein monatliches **Nettoeinkommen** (€)", title="💰 Nettoeinkommen (Alt: Dein monatliches Nettoeinkommen)", min_value=0, value=2800, step=50)
-    anzahl_kinder = st.number_input("👨‍👧‍👦 **Anzahl der Kinder** (bei der Ex)", title="👨‍👧‍👦 Anzahl Kinder (Alt: Anzahl der Kinder bei der Ex)", min_value=1, max_value=10, value=2, step=1)
+    netto = st.number_input("💰 Dein monatliches **Nettoeinkommen** (€)", min_value=0, value=2800, step=50)
+    anzahl_kinder = st.number_input("👨‍👧‍👦 **Anzahl der Kinder** (bei der Ex)", min_value=1, max_value=10, value=2, step=1)
     erwerbstaetig = st.checkbox("Ich bin erwerbstätig", value=True)
 
 with col2:
-    weitere_kinder = st.number_input("👨‍👩‍👦 **Weitere Kinder** in neuer Beziehung", title="👨‍👩‍👦 Weitere Kinder (Alt: Weitere Kinder in neuer Beziehung)", min_value=0, value=0, step=1)
+    weitere_kinder = st.number_input("👨‍👩‍👦 **Weitere Kinder** in neuer Beziehung", min_value=0, value=0, step=1)
     ehegattenunterhalt = st.checkbox("**Auch Ehegattenunterhalt** berechnen", value=False)
 
 alter_liste = []
 for i in range(anzahl_kinder):
-    alter = st.number_input(f"👶 Alter Kind {i+1} (Jahre)", title=f"👶 Alter Kind {i+1} (Alt: Alter des Kindes in Jahren)", min_value=0, max_value=30, value=8, step=1)
+    alter = st.number_input(f"👶 Alter Kind {i+1} (Jahre)", min_value=0, max_value=30, value=8, step=1)
     alter_liste.append(alter)
 
 sonderbedarf = st.number_input(
     "🩹 **Sonderbedarf** pro Monat (€)", 
-    title="🩹 Sonderbedarf (Alt: Zusätzliche Kosten wie Nachhilfe oder Medikamente)", min_value=0, value=0, step=10,
+    min_value=0, value=0, step=10,
     help="**Sonderbedarf:** Zusätzliche Kosten wie Nachhilfe, Medikamente, Sportgeräte, Brille oder Therapie. Das Jugendamt kann das anerkennen und den Unterhalt erhöhen. Belege immer mit Rechnungen!"
 )
 
 umgangskosten = st.number_input(
     "🚗 **Umgangskosten** pro Monat (€)", 
-    title="🚗 Umgangskosten (Alt: Kosten für Besuche bei den Kindern)", min_value=0, value=0, step=10,
+    min_value=0, value=0, step=10,
     help="**Umgangskosten:** Fahrkosten, Übernachtungen oder andere Ausgaben für Besuche bei deinen Kindern. Diese können vom Unterhalt abgezogen werden – oft 1/3 der Kosten oder pauschal 100–200 €/Monat."
 )
 
 if ehegattenunterhalt:
     st.subheader("💔 Ehegattenunterhalt")
-    netto_ex = st.number_input("**Nettoeinkommen der Ex** (€)", title="Nettoeinkommen der Ex (Alt: Monatliches Nettoeinkommen der Ex-Partnerin)", min_value=0, value=1200, step=50)
-    ehe_dauer = st.number_input("**Dauer der Ehe** (Jahre)", title="Dauer der Ehe (Alt: Anzahl Jahre der Ehe)", min_value=1, value=8, step=1)
+    netto_ex = st.number_input("**Nettoeinkommen der Ex** (€)", min_value=0, value=1200, step=50)
+    ehe_dauer = st.number_input("**Dauer der Ehe** (Jahre)", min_value=1, value=8, step=1)
     betreuung = st.checkbox("Ex betreut hauptsächlich die Kinder", value=True)
 
 # CTA
@@ -120,6 +120,24 @@ with col_cta2:
 
             Mehr Infos: [dsgvo-gesetz.de](https://dsgvo-gesetz.de). Bei Fragen: [E-Mail].
             """)
+
+# Impressum-Button
+if st.button("Impressum anzeigen", type="secondary"):
+    with st.expander("Impressum (Stand: 15.02.2026)"):
+        st.markdown("""
+        ### Impressum
+
+        **Angaben gemäß § 5 TMG:**
+
+        [Dein Name]  
+        [Deine Adresse, z. B. Musterstraße 1, 12345 Musterstadt]  
+        [Telefon: +49 123 456789]  
+        [E-Mail: info@unterhaltsrechner.de]  
+
+        **Haftungshinweis:** Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.  
+
+        **Urheberrecht:** Basierend auf Düsseldorfer Tabelle 2026 (Quelle: OLG Düsseldorf, https://www.olg-duesseldorf.nrw.de/infos/Duesseldorfer_Tabelle/Tabelle-2026/index.php). Alle Rechte vorbehalten.
+        """)
 
 if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=True):
     # GA-Event (nur bei Consent)
@@ -233,24 +251,6 @@ Datenschutz: Deine Eingaben wurden nicht gespeichert.
           gtag('event', 'pdf_download', {{ 'value': 1 }});
         </script>
         """, height=0)
-
-# Impressum (neu hinzugefügt)
-if st.button("Impressum anzeigen", type="secondary"):
-    with st.expander("Impressum (Stand: 15.02.2026)"):
-        st.markdown("""
-        ### Impressum
-
-        **Angaben gemäß § 5 TMG:**
-
-        [Gregor Enns]  
-        [Detmolder Weg 14, 32657 Lemgo]  
-        [Telefon: +49 1717054933]  
-        [E-Mail: gregor.enns@gmx.de]  
-
-        **Haftungshinweis:** Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.  
-
-        **Urheberrecht:** Basierend auf Düsseldorfer Tabelle 2026 (Quelle: OLG Düsseldorf, https://www.olg-duesseldorf.nrw.de/infos/Duesseldorfer_Tabelle/Tabelle-2026/index.php). Alle Rechte vorbehalten.
-        """)
 
 st.markdown("---")
 st.caption("Erstellt mit Grok • Vollversion • Februar 2026 • Keine Rechtsberatung")
