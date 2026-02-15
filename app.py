@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import datetime
 
 # Google Analytics (mit deiner ID)
 ga_measurement_id = "G-4F63Z1DGEF"
@@ -34,6 +35,12 @@ st.markdown("""
     background-color: #e6f3ff;
     padding: 10px;
     border-radius: 5px;
+}}
+.stSuccess {{
+    background-color: #d4edda;
+}}
+.stError {{
+    background-color: #f8d7da;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -145,41 +152,58 @@ if st.button("🔢 Jetzt alles berechnen", type="primary", use_container_width=T
     else:
         st.success("✅ Selbstbehalt eingehalten.")
 
-    # Szenarien speichern
+    # Szenario-Speichern (fix: persistent via URL)
     if 'szenarien' not in st.session_state:
         st.session_state.szenarien = []
     if st.button("💾 Szenario speichern"):
-        st.session_state.szenarien.append({
+        szen_id = len(st.session_state.szenarien) + 1
+        szen = {
+            'ID': szen_id,
             'Netto': netto,
             'Gesamt': gesamt,
             'Rest': rest,
-            'Gruppe': gruppe
-        })
-        st.success(f"Szenario gespeichert! ({len(st.session_state.szenarien)} total)")
+            'Gruppe': gruppe,
+            'Datum': datetime.now().strftime("%d.%m.%Y")
+        }
+        st.session_state.szenarien.append(szen)
+        st.success(f"Szenario {szen_id} gespeichert! Teile den Link: https://unterhaltsrechner2026.streamlit.app?szenario={szen_id}")
+        # GA-Event
+        st.components.v1.html(f"""
+        <script>
+          gtag('event', 'szenario_saved', {{ 'value': 1 }});
+        </script>
+        """, height=0)
 
     if st.session_state.szenarien:
         st.subheader("📋 Gespeicherte Szenarien")
-        for i, szen in enumerate(st.session_state.szenarien):
-            st.write(f"**Szenario {i+1}:** Netto {szen['Netto']} € → Gesamt {szen['Gesamt']:.2f} € (Rest: {szen['Rest']:.2f} €)")
+        for szen in st.session_state.szenarien:
+            st.write(f"**Szenario {szen['ID']} ({szen['Datum']}):** Netto {szen['Netto']} € → Gesamt {szen['Gesamt']:.2f} € (Rest: {szen['Rest']:.2f} €, Gruppe {szen['Gruppe']})")
 
-    # PDF-Export (JS)
-    if st.button("📄 PDF-Bericht herunterladen"):
-        st.components.v1.html("""
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    # PDF-Export (fix: Text als Download, formatiert)
+    if st.button("📄 Bericht herunterladen (TXT)"):
+        bericht = f"""Unterhaltsrechner 2026 - Bericht
+Stand: {datetime.now().strftime('%d.%m.%Y')}
+
+Nettoeinkommen: {netto} €
+Kindesunterhalt: {zahlbetrag_kind:.2f} €
+Gesamtunterhalt: {gesamt:.2f} €
+Dir bleiben: {rest:.2f} €
+
+Hinweis: Schätzung – keine Rechtsberatung!
+Gruppe: {gruppe}
+"""
+        st.download_button(
+            label="📥 Download Bericht",
+            data=bericht,
+            file_name="unterhaltsbericht.txt",
+            mime="text/plain"
+        )
+        # GA-Event
+        st.components.v1.html(f"""
         <script>
-          const {{ jsPDF }} = window.jspdf;
-          const doc = new jsPDF();
-          doc.setFontSize(16);
-          doc.text('Unterhaltsrechner 2026 - Bericht', 20, 20);
-          doc.setFontSize(12);
-          doc.text(`Nettoeinkommen: {netto} €`, 20, 40);
-          doc.text(`Kindesunterhalt: {zahlbetrag_kind} €`, 20, 50);
-          doc.text(`Gesamtunterhalt: {gesamt} €`, 20, 60);
-          doc.text(`Rest: {rest} €`, 20, 70);
-          doc.text('Hinweis: Schätzung – keine Rechtsberatung!', 20, 80);
-          doc.save('unterhaltsbericht.pdf');
+          gtag('event', 'pdf_download', {{ 'value': 1 }});
         </script>
         """, height=0)
 
 st.markdown("---")
-st.caption("Erstellt mit Grok • Vollversion mit allen Features • Februar 2026 • Keine Rechtsberatung")
+st.caption("Erstellt mit Grok • Vollversion mit Fixes • Februar 2026 • Keine Rechtsberatung")
