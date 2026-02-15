@@ -1,9 +1,19 @@
 import streamlit as st
-from streamlit_ga import GoogleAnalytics
 
-# Dein GA-Tracking-ID (z. B. 'G-XXXXXXXXXX' – erstelle ein Konto auf analytics.google.com)
-ga = GoogleAnalytics('G-4F63Z1DGEF')
-ga.track()
+# Google Analytics einbinden (ersetze mit deiner Measurement ID, z. B. "G-ABC123DEF")
+ga_measurement_id = "G-4F63Z1DGEF"  # Deine ID aus Google Analytics
+
+ga_script = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={ga_measurement_id}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{ga_measurement_id}');
+</script>
+"""
+
+st.components.v1.html(ga_script, height=0)
 
 st.set_page_config(page_title="Unterhaltsrechner 2026 Pro", page_icon="👨‍👧‍👦", layout="wide")
 
