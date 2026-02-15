@@ -93,12 +93,31 @@ if ehegattenunterhalt:
     ehe_dauer = st.number_input("**Dauer der Ehe** (Jahre)", min_value=1, value=8, step=1)
     betreuung = st.checkbox("Ex betreut hauptsächlich die Kinder", value=True)
 
-# CTA (ohne Pro-Version)
+# CTA (fix: Teilen kopiert Link automatisch)
 col_cta1, col_cta2 = st.columns(2)
 with col_cta1:
     if st.button("📱 App teilen", type="secondary"):
+        # GA-Event (nur bei Consent)
+        if st.session_state.ga_consent:
+            st.components.v1.html(f"""
+            <script>
+              gtag('event', 'app_shared', {{ 'value': 1 }});
+            </script>
+            """, height=0)
+        
+        # Link kopieren via JS
+        st.components.v1.html("""
+        <script>
+          navigator.clipboard.writeText(window.location.href).then(() => {{
+            alert('Link kopiert! Teile ihn mit Vätern in deiner Gruppe.');
+          }}).catch(() => {{
+            alert('Kopieren fehlgeschlagen – kopiere den Link manuell: ' + window.location.href);
+          }});
+        </script>
+        """, height=0)
+        
         st.balloons()
-        st.success("Danke fürs Teilen! Deine Empfehlung hilft anderen Vätern. 😊")
+        st.success("Link kopiert! Deine Empfehlung hilft anderen Vätern. 😊")
 with col_cta2:
     if st.button("Datenschutzerklärung anzeigen", type="secondary"):
         with st.expander("Datenschutzerklärung (Stand: 15.02.2026)"):
