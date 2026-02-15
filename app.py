@@ -20,8 +20,17 @@ for i in range(anzahl_kinder):
     alter = st.number_input(f"Alter Kind {i+1} (Jahre)", min_value=0, max_value=30, value=8, step=1)
     alter_liste.append(alter)
 
-sonderbedarf = st.number_input("**Sonderbedarf** pro Monat (€)", min_value=0, value=0, step=10)
-umgangskosten = st.number_input("**Umgangskosten** pro Monat (€)", min_value=0, value=0, step=10)
+sonderbedarf = st.number_input(
+    "**Sonderbedarf** pro Monat (€)", 
+    min_value=0, value=0, step=10,
+    help="**Sonderbedarf:** Zusätzliche Kosten wie Nachhilfe, Medikamente, Sportgeräte, Brille oder Therapie. Das Jugendamt kann das anerkennen und den Unterhalt erhöhen. Belege immer mit Rechnungen!"
+)
+
+umgangskosten = st.number_input(
+    "**Umgangskosten** pro Monat (€)", 
+    min_value=0, value=0, step=10,
+    help="**Umgangskosten:** Fahrkosten, Übernachtungen oder andere Ausgaben für Besuche bei deinen Kindern. Diese können vom Unterhalt abgezogen werden – oft 1/3 der Kosten oder pauschal 100–200 €/Monat."
+)
 
 if ehegattenunterhalt:
     st.subheader("Ehegattenunterhalt")
@@ -80,4 +89,4 @@ if st.button("Jetzt alles berechnen", type="primary", use_container_width=True):
         st.success("✅ Selbstbehalt eingehalten.")
 
 st.markdown("---")
-st.caption("Erstellt mit Grok • Vollversion • Februar 2026 • PDF kommt später")
+st.caption("Erstellt mit Grok • Vollversion • Februar 2026 • Keine Rechtsberatung")
